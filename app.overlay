@@ -1,0 +1,20 @@
+/ {
+    aliases {
+        motor-ain1 = &ain1_pin;
+        motor-ain2 = &ain2_pin;
+        motor-pwma = &pwma_pin;
+    };
+
+    leds {
+        compatible = "gpio-leds";
+        ain1_pin: ain1 {
+            gpios = <&gpioa 0 GPIO_ACTIVE_HIGH>;
+        };
+        ain2_pin: ain2 {
+            gpios = <&gpioa 4 GPIO_ACTIVE_HIGH>;
+        };
+        pwma_pin: pwma {
+            gpios = <&gpioa 1 GPIO_ACTIVE_HIGH>;
+        };
+    };
+};
