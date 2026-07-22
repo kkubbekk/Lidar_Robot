@@ -1,8 +1,14 @@
-/ {
+/{
     aliases {
         motor-ain1 = &ain1_pin;
         motor-ain2 = &ain2_pin;
+        motor-bin1 = &bin1_pin;
+        motor-bin2 = &bin2_pin;
         motor-pwma = &pwma_pin;
+        motor-pwmb = &pwmb_pin;
+        encoder-left = &qdec_l;
+        encoder-right = &qdec_r;
+
     };
 
     leds {
@@ -13,8 +19,79 @@
         ain2_pin: ain2 {
             gpios = <&gpioa 4 GPIO_ACTIVE_HIGH>;
         };
-        pwma_pin: pwma {
-            gpios = <&gpioa 1 GPIO_ACTIVE_HIGH>;
+        bin1_pin: bin1 {
+            gpios = <&gpioc 6 GPIO_ACTIVE_HIGH>;
+        };
+        bin2_pin: bin2 {
+            gpios = <&gpioc 5 GPIO_ACTIVE_HIGH>;
         };
     };
+
+    /* ZMIANA: użyto 'gpio_keys' (z podkreślnikiem) zamiast 'gpio-keys',
+       aby scalić się z wbudowanym węzłem płytki STM32 i uniknąć konfliktu makr w C */
+    gpio_keys {
+        compatible = "gpio-keys";
+        button1: button1 {
+            gpios = <&gpioc 13 GPIO_ACTIVE_LOW>;
+            label = "Button 1";
+            // linux,code = <28>;
+        };
+    };
+
+    pwm_motors {
+        compatible = "pwm-leds";
+        pwma_pin: pwma {
+            /* 100 000 nanosekund = 10 kHz */
+            pwms = <&pwm2 2 100000 PWM_POLARITY_NORMAL>;
+        };
+        pwmb_pin:pwmb {
+            /* 100 000 nanosekund = 10 kHz */
+            pwms = <&pwm2 3 100000 PWM_POLARITY_NORMAL>;
+        };
+    };
+};
+
+&timers3 {
+    status = "okay";
+
+    pwm {
+        status = "disabled";
+    };
+
+    qdec_l: encoder_left {
+        compatible = "st,stm32-qdec";
+        status = "okay";
+        pinctrl-0 = <&tim3_ch1_pa6 &tim3_ch2_pa7>;
+        pinctrl-names = "default";
+        st,counts-per-revolution = <660>;
+        label = "Encoder do silnik lewy";
+    };
+};
+&timers4 {
+    status = "okay";
+
+    pwm {
+        status = "disabled";
+    };
+    qdec_r: encoder_right {
+        compatible = "st,stm32-qdec";
+        status = "okay";
+        pinctrl-0 = <&tim4_ch1_pb6 &tim4_ch2_pb7>;
+        pinctrl-names = "default";
+        st,counts-per-revolution = <660>;
+        label = "Encoder do silnik prawy";
+    };
+};
+
+
+&pwm2 {
+    status = "okay";
+    pinctrl-0 = <&tim2_ch2_pa1 &tim2_ch3_pb10>;
+    pinctrl-names = "default";
+};
+
+
+
+&spi1 {
+    status = "disabled";
 };
