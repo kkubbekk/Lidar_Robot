@@ -23,12 +23,7 @@ int main(void)
         return 0;
     }
 
-    gpio_pin_configure_dt(&ain1, GPIO_OUTPUT_ACTIVE);
-    gpio_pin_configure_dt(&ain2, GPIO_OUTPUT_INACTIVE);
-
-
-    gpio_pin_configure_dt(&bin1, GPIO_OUTPUT_ACTIVE);
-    gpio_pin_configure_dt(&bin2, GPIO_OUTPUT_INACTIVE);
+ 
 
    
 

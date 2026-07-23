@@ -27,8 +27,6 @@
         };
     };
 
-    /* ZMIANA: użyto 'gpio_keys' (z podkreślnikiem) zamiast 'gpio-keys',
-       aby scalić się z wbudowanym węzłem płytki STM32 i uniknąć konfliktu makr w C */
     gpio_keys {
         compatible = "gpio-keys";
         button1: button1 {
@@ -90,7 +88,17 @@
     pinctrl-names = "default";
 };
 
+&i2c1 {
 
+    status ="okay";
+
+    bno055@28{
+    compatible ="bosch,bno055";
+    status = "okay";
+    reg = <0x28>;
+    };
+
+};
 
 &spi1 {
     status = "disabled";
