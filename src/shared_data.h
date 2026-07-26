@@ -9,3 +9,16 @@ typedef struct {
     float robot_speed_mps;
     } motor_sample_t;
 
+
+typedef struct {
+    int16_t yaw;
+    int16_t roll;
+    int16_t pitch;
+} imu_sample_t;
+
+typedef enum{
+    STATE_OKAY = 0,
+    STATE_ERROR,
+    STATE_ROS_ERROR,
+
+} robot_state_t;

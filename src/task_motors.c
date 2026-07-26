@@ -154,8 +154,8 @@ while (1) {
         
 
         // na debug
-        printk("Left Encoder: Val1: %d | Val2: %d\n", left_position_actual.val1, left_position_actual.val2);
-        printk("Right Encoder: Val1: %d | Val2: %d\n", right_position_actual.val1, right_position_actual.val2);
+        // printk("Left Encoder: Val1: %d | Val2: %d\n", left_position_actual.val1, left_position_actual.val2);
+        // printk("Right Encoder: Val1: %d | Val2: %d\n", right_position_actual.val1, right_position_actual.val2);
 
         int64_t now_us = k_uptime_get()*1000;
         
@@ -179,9 +179,9 @@ while (1) {
 
       
 
-    printk("v_l: %f | v_r: %f | ang_v: %f | v_lin: %f | acum_left: %lld | acum_right: %lld |\n",
-       motor_data.v_left_mps, motor_data.v_right_mps, motor_data.motor_angular_speed,
-       motor_data.robot_speed_mps, motor_data.acumulated_left_encoder_ticks, motor_data.acumulated_right_encoder_ticks);
+    // printk("v_l: %f | v_r: %f | ang_v: %f | v_lin: %f | acum_left: %lld | acum_right: %lld |\n",
+    //    motor_data.v_left_mps, motor_data.v_right_mps, motor_data.motor_angular_speed,
+    //    motor_data.robot_speed_mps, motor_data.acumulated_left_encoder_ticks, motor_data.acumulated_right_encoder_ticks);
        
         
         k_timer_status_sync(&motor_sample_timer);

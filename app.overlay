@@ -8,6 +8,7 @@
         motor-pwmb = &pwmb_pin;
         encoder-left = &qdec_l;
         encoder-right = &qdec_r;
+        imu = &bno055;
 
     };
 
@@ -90,12 +91,12 @@
 
 &i2c1 {
 
-    status ="okay";
-
-    bno055@28{
-    compatible ="bosch,bno055";
     status = "okay";
-    reg = <0x28>;
+
+    bno055: bno055@28 {
+        compatible = "i2c-device";
+        status = "okay";
+        reg = <0x29>;
     };
 
 };
