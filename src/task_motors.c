@@ -4,9 +4,9 @@
 #define WHEEL_BASE_MM 400
 #define WHEEL_RADIUS_MM 65
 #define PWM_PERIOD_NS 100000
-#define KP 0.1f
-#define KI 0.05f
-#define KD 0.01f
+#define KP 0.15f
+#define KI 0.03f
+#define KD 0.00f
 
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
@@ -116,11 +116,16 @@ float calculate_pid_and_set_pwm(float v_now,float v_target,pid_state_t* pid_stat
 
     //ki
     pid_state->integral += error *dt_s;
+    
+    if(pid_state->integral > 2000.0f) pid_state->integral = 2000.0f;
+    if(pid_state->integral < -2000.0f) pid_state->integral = -2000.0f;
+
     float k_i = KI*pid_state->integral;
 
     //kd
     float k_d = (dt_s > 0.0f) ? (error - pid_state->prev_error) * KD / dt_s : 0.0f;
 
+    pid_state->prev_error = error;
     float pwm_percent = k_p + k_i + k_d; // BEZ fabs()!
 
     if(pwm_percent > 100.0f) pwm_percent = 100.0f;
@@ -222,19 +227,21 @@ while (1) {
        float raw_v_left = calculate_linear_speed(delta_left, dt_ms);
        float raw_v_right = calculate_linear_speed(delta_right, dt_ms);
 
-       filtered_v_left  = (0.2f * raw_v_left)  + (0.8f * filtered_v_left);
-       filtered_v_right = (0.2f * raw_v_right) + (0.8f * filtered_v_right);
+    //    filtered_v_left  = (0.2f * raw_v_left)  + (0.8f * filtered_v_left);
+    //    filtered_v_right = (0.2f * raw_v_right) + (0.8f * filtered_v_right);
 
-        float target_v_left = 150.5f;   // testowo, na sztywno
+        float target_v_left = -150.5f;   // testowo, na sztywno
         float target_v_right = 200.5f;  // testowo, na sztywno
 
-        // ... w pętli, po obliczeniu motor_data.v_left_mps/v_right_mps:
-
-        float pwm_left  = calculate_pid_and_set_pwm(filtered_v_left, target_v_left, &pid_left, dt_ms);
-        float pwm_right  = calculate_pid_and_set_pwm(filtered_v_right, target_v_right, &pid_right, dt_ms);
+   
+        float pwm_left  = calculate_pid_and_set_pwm(raw_v_left, target_v_left, &pid_left, dt_ms);
+        float pwm_right  = calculate_pid_and_set_pwm(raw_v_right, target_v_right, &pid_right, dt_ms);
 
         set_velocity_motor((int32_t)(target_v_left*1000), &ain1, &ain2, &pwma, (int32_t)pwm_left);
         set_velocity_motor((int32_t)(target_v_right*1000), &bin1, &bin2, &pwmb, (int32_t)pwm_right);
+
+        motor_data.v_left_mps = filtered_v_left;
+    motor_data.v_right_mps = filtered_v_right;
 
         printk("L: now=%.2f target=%.2f pwm=%.0f | R: now=%.2f target=%.2f pwm=%.0f\n",
     (double)motor_data.v_left_mps, (double)target_v_left, (double)pwm_left,
