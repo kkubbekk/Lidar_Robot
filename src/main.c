@@ -4,6 +4,7 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/i2c.h>
+#include "shared_data.h"
 
 //aliasy
  const struct gpio_dt_spec ain1 = GPIO_DT_SPEC_GET(DT_ALIAS(motor_ain1), gpios);
@@ -17,14 +18,26 @@
  const struct device *const encoder_right = DEVICE_DT_GET(DT_ALIAS(encoder_right));
  const struct i2c_dt_spec imu = I2C_DT_SPEC_GET(DT_ALIAS(imu));
 
+ atomic_t robot_state = ATOMIC_INIT(STATE_OKAY); // inicjalizujemy stan poczatkowy robotaja na ok;
+
+
+
 int main(void)
 {
     if (!gpio_is_ready_dt(&ain1) || !gpio_is_ready_dt(&ain2) || !pwm_is_ready_dt(&pwma) || !device_is_ready(encoder_left) || !device_is_ready(encoder_right) || !i2c_is_ready_dt(&imu) || !gpio_is_ready_dt(&bin1) || !gpio_is_ready_dt(&bin2) || !pwm_is_ready_dt(&pwmb)) {
         printk("BLAD: Sprzet nie jest gotowy!\n");
+
+        
         return 0;
     }
 
- 
+    
+    gpio_pin_configure_dt(&ain1, GPIO_OUTPUT_ACTIVE);
+    gpio_pin_configure_dt(&ain2, GPIO_OUTPUT_INACTIVE);
+
+
+    gpio_pin_configure_dt(&bin1, GPIO_OUTPUT_ACTIVE);
+    gpio_pin_configure_dt(&bin2, GPIO_OUTPUT_INACTIVE);
 
    
 

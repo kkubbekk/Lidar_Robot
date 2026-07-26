@@ -11,14 +11,17 @@ typedef struct {
 
 
 typedef struct {
-    int16_t yaw;
-    int16_t roll;
-    int16_t pitch;
+    float yaw;
+    float roll;
+    float pitch;
 } imu_sample_t;
 
 typedef enum{
     STATE_OKAY = 0,
-    STATE_ERROR,
+    STATE_TIPPED,
+    STATE_SENSOR_ERROR,
     STATE_ROS_ERROR,
+    STATE_MOTOR_FAULT,
+    STATE_LOW_BATTERY,//jak dojdzie akus kiedys
 
 } robot_state_t;

@@ -11,7 +11,8 @@
 #include "imu.h"
 
 
-
+//robot state
+extern atomic_t robot_state;
 
 //thread definition
 void task_imu(void *arg1,void *arg2,void *arg3);
@@ -25,9 +26,14 @@ K_TIMER_DEFINE(imu_sample_timer,NULL,NULL);
 //i2c struct
 extern const struct i2c_dt_spec imu;
 
+//queue definition
+K_MSGQ_DEFINE(imu_msg, sizeof(imu_sample_t), 5, 4);
+
+
 void task_imu(void *arg1,void *arg2,void *arg3)
 {
-  
+
+    imu_sample_t imu_data = {0};
 
     k_msleep(50);
 
@@ -57,18 +63,32 @@ void task_imu(void *arg1,void *arg2,void *arg3)
       
           if(imu_read_data(&yaw,&roll,&pitch))
       {
-          if(abs(roll)<30.0f || abs(pitch)<30.0f)
+          imu_data.yaw = yaw;
+          imu_data.roll = roll;
+          imu_data.pitch = pitch;
+
+          if(abs(roll)>30.0f || abs(pitch)>30.0f)
           {
-            //test
-            printk("yaw: %d,roll: %d,pitch: %d\n",(int)yaw, (int)roll, (int)pitch);
-            
+          //zmiana statusu na error i wylaczenie silnikow w ten sposob
+            atomic_set(&robot_state, STATE_TIPPED);
           }
           else
           {
-             printk("robot sie wyjebal");
-             //TODO: dodanie maszyny stanow
+            //zmiana statusu jak bedzie git
+            atomic_set(&robot_state, STATE_OKAY);
           }
-      }
+          
+
+
+           if(k_msgq_put(&imu_msg,&imu_data,K_NO_WAIT)==0)
+           {
+            //udalo sie
+           }
+           else
+           {
+            //przepelnione naprzyklad
+           }
+           
     }
      
       
@@ -81,5 +101,6 @@ void task_imu(void *arg1,void *arg2,void *arg3)
   
   }
     
-    
+   
+  }
 }
