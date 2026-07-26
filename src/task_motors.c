@@ -219,17 +219,19 @@ while (1) {
         //     atomic_set(&robot_state,STATE_MOTOR_FAULT);
         // }
 
-        motor_data.v_left_mps  = calculate_linear_speed(delta_left, dt_ms);
-        motor_data.v_right_mps  = calculate_linear_speed(delta_right, dt_ms);
+       float raw_v_left = calculate_linear_speed(delta_left, dt_ms);
+       float raw_v_right = calculate_linear_speed(delta_right, dt_ms);
 
+       filtered_v_left  = (0.2f * raw_v_left)  + (0.8f * filtered_v_left);
+       filtered_v_right = (0.2f * raw_v_right) + (0.8f * filtered_v_right);
 
         float target_v_left = 150.5f;   // testowo, na sztywno
         float target_v_right = 200.5f;  // testowo, na sztywno
 
         // ... w pętli, po obliczeniu motor_data.v_left_mps/v_right_mps:
 
-        float pwm_left  = calculate_pid_and_set_pwm(motor_data.v_left_mps, target_v_left, &pid_left, dt_ms);
-        float pwm_right = calculate_pid_and_set_pwm(motor_data.v_right_mps, target_v_right, &pid_right, dt_ms);
+        float pwm_left  = calculate_pid_and_set_pwm(filtered_v_left, target_v_left, &pid_left, dt_ms);
+        float pwm_right  = calculate_pid_and_set_pwm(filtered_v_right, target_v_right, &pid_right, dt_ms);
 
         set_velocity_motor((int32_t)(target_v_left*1000), &ain1, &ain2, &pwma, (int32_t)pwm_left);
         set_velocity_motor((int32_t)(target_v_right*1000), &bin1, &bin2, &pwmb, (int32_t)pwm_right);
