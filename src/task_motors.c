@@ -230,7 +230,7 @@ while (1) {
     //    filtered_v_left  = (0.2f * raw_v_left)  + (0.8f * filtered_v_left);
     //    filtered_v_right = (0.2f * raw_v_right) + (0.8f * filtered_v_right);
 
-        float target_v_left = -150.5f;   // testowo, na sztywno
+        float target_v_left = 150.5f;   // testowo, na sztywno
         float target_v_right = 200.5f;  // testowo, na sztywno
 
    
@@ -240,8 +240,8 @@ while (1) {
         set_velocity_motor((int32_t)(target_v_left*1000), &ain1, &ain2, &pwma, (int32_t)pwm_left);
         set_velocity_motor((int32_t)(target_v_right*1000), &bin1, &bin2, &pwmb, (int32_t)pwm_right);
 
-        motor_data.v_left_mps = filtered_v_left;
-    motor_data.v_right_mps = filtered_v_right;
+        motor_data.v_left_mps = raw_v_left;
+    motor_data.v_right_mps = raw_v_right;
 
         printk("L: now=%.2f target=%.2f pwm=%.0f | R: now=%.2f target=%.2f pwm=%.0f\n",
     (double)motor_data.v_left_mps, (double)target_v_left, (double)pwm_left,
