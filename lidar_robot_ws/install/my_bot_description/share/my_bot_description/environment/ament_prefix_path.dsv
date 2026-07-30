@@ -1,1 +1,1 @@
-/home/kubekpc/lidar_robot_ws/build/my_bot_description/ament_cmake_environment_hooks/ament_prefix_path.dsv
+prepend-non-duplicate;AMENT_PREFIX_PATH;
