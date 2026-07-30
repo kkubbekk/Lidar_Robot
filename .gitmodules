@@ -1,0 +1,3 @@
+[submodule "lidar_robot_ws/src/ldlidar"]
+	path = lidar_robot_ws/src/ldlidar
+	url = https://github.com/linorobot/ldlidar.git
