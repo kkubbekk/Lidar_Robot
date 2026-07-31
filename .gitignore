@@ -21,3 +21,6 @@ zephyr/zephyr.dts.pre
 *.o
 .vscode/
 .settings/
+lidar_robot_ws/build/
+lidar_robot_ws/install/
+lidar_robot_ws/log/
