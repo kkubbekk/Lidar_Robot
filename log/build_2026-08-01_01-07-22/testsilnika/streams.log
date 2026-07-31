@@ -1,0 +1,16 @@
+[0.013s] Invoking command in '/home/kubekpc/Lidar_Robot/build/testsilnika': /usr/bin/cmake /home/kubekpc/Lidar_Robot/firmware -DCMAKE_INSTALL_PREFIX=/home/kubekpc/Lidar_Robot/install/testsilnika
+[0.024s] [31mCMake Error at CMakeLists.txt:2 (find_package):
+[0.024s]   Could not find a package configuration file provided by "Zephyr" with any
+[0.024s]   of the following names:
+[0.025s] 
+[0.025s]     ZephyrConfig.cmake
+[0.025s]     zephyr-config.cmake
+[0.025s] 
+[0.025s]   Add the installation prefix of "Zephyr" to CMAKE_PREFIX_PATH or set
+[0.025s]   "Zephyr_DIR" to a directory containing one of the above files.  If "Zephyr"
+[0.025s]   provides a separate development package or SDK, be sure it has been
+[0.025s]   installed.
+[0.025s] 
+[0.025s] [0m
+[0.025s] -- Configuring incomplete, errors occurred!
+[0.026s] Invoked command in '/home/kubekpc/Lidar_Robot/build/testsilnika' returned '1': /usr/bin/cmake /home/kubekpc/Lidar_Robot/firmware -DCMAKE_INSTALL_PREFIX=/home/kubekpc/Lidar_Robot/install/testsilnika

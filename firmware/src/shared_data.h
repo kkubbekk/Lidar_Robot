@@ -25,3 +25,9 @@ typedef enum{
     STATE_LOW_BATTERY,//jak dojdzie akus kiedys
 
 } robot_state_t;
+
+typedef struct 
+{
+   float v_left;
+   float v_right;
+} ros_data_t;
