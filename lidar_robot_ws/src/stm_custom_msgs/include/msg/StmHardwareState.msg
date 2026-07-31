@@ -1,0 +1,11 @@
+float32 v_left_mps
+float32 v_right_mps
+int32 timestamp_ms
+int64 accum_left_ticks
+int64 accum_right_ticks
+float32 motor_angular_speed
+float32 robot_speed_mps
+float32 imu_yaw
+float32 imu_roll
+float32 imu_pitch
+uint8 robot_state
