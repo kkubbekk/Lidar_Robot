@@ -256,6 +256,8 @@ while (1) {
 
         motor_data.robot_speed_mps = calculate_robot_speed(motor_data.v_left_mps,motor_data.v_right_mps);
 
+        motor_data.timestamp_ms =(uint32_t)now_ms;
+
 
         if(k_msgq_put(&motor_msg,&motor_data,K_NO_WAIT)==0)
         {

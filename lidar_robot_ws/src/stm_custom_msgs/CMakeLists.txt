@@ -8,6 +8,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
+find_package(builtin_interfaces REQUIRED)
 
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -15,12 +16,14 @@ find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/StmHardwareState.msg"
+  DEPENDENCIES builtin_interfaces
 )
 
 
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
+  
   
   # the following line skips the linter which checks for copyrights
   # comment the line when a copyright and license is added to all source files

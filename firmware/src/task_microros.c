@@ -16,6 +16,9 @@ extern atomic_t robot_state;
 #include <rcl/error_handling.h>
 #include <std_msgs/msg/float32_multi_array.h>
 
+
+K_MSGQ_DEFINE(ros_msg, sizeof(ros_data_t), 5, 4);
+
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 
@@ -31,7 +34,44 @@ rcl_timer_t timer;
 
 std_msgs__msg__Float32MultiArray msg_rx;
 
-std_msgs__msg__Float32MultiArray msg_tx;
+stm_custom_msgs__msg__StmHardwareState msg_tx;
+
+void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
+{
+    imu_sample_t imu_data={0};
+    motor_sample_t moto_data={0};
+    
+    int ret = k_msgq_get(&imu_msg, &imu_data, K_NO_WAIT);
+    int ret1 = k_msgq_get(&motor_msg,&moto_data,K_NO_WAIT);
+    if(ret1 == 0 || ret == 0)
+    {
+        //moto
+        msg_tx.v_left_mps = moto_data.v_left_mps;
+        msg_tx.v_right_mps = moto_data.v_right_mps;
+        msg_tx.accum_left_ticks = moto_data.accum_left_ticks;
+        msg_tx.accum_right_ticks = moto_data.accum_right_ticks;
+        msg_tx.motor_angular_speed = moto_data.motor_angular_speed;
+        msg_tx.motor_linear_speed = moto_data.robot_speed_mps;
+        
+        msg_tx.imu_yaw = imu_data.yaw;
+        msg_tx.imu_pitch = imu_data.pitch;
+        msg_tx.imu_roll = imu_data.roll;
+        msg_tx.robot_state = (uint8_t)atomic_get(&robot_state);
+        
+
+
+        uint32_t timestamp = k_uptime_get_32();
+
+        msg_tx.time_stamp = timestamp;
+
+
+      
+
+        rcl_publish(&publisher, &msg_tx, NULL);
+    }
+    else{
+        atomic_set(&robot_state,STATE_ROS_ERROR);
+    }
 
 
 
@@ -59,20 +99,7 @@ void subscription_callback(const void * msg_in)
       
     }
 }
-void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
-{
-    imu_sample_t imu_data={0};
-    motor_sample_t moto_data={0};
-    
-    int ret = k_msgq_get(&imu_msg, &imu_data, 100);
-    int ret1 = k_msgq_get(&motor_msg,&moto_data,100);
-    if(ret1 == 0 || ret == 0)
-    {
-        msg_tx.data.
-    }
-    else{
 
-    }
 
 
 }
@@ -80,7 +107,6 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
 void main(void)
 {
 
-    K_MSGQ_DEFINE(ros_msg, sizeof(ros_data_t), 5, 4);
 
  //alocator
     allocator = rcl_get_default_allocator();
@@ -90,7 +116,7 @@ void main(void)
 
     rclc_node_init_default(&node,"stm32_motor_node","",&support);
 //subcriber definition
-    rclc_subcription_init_default(
+    rclc_subscription_init_default(
         &subscriber,
         &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
