@@ -10,7 +10,7 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
-add_executable(vel_parser src/VelParserNode.cpp)
+add_executable(vel_parser_node src/VelParserNode.cpp)
 ament_target_dependencies(vel_parser rclcpp geometry_msgs std_msgs)
 
 install(TARGETS

@@ -25,7 +25,7 @@
 int main(void)
 {
     if (!gpio_is_ready_dt(&ain1) || !gpio_is_ready_dt(&ain2) || !pwm_is_ready_dt(&pwma) || !device_is_ready(encoder_left) || !device_is_ready(encoder_right) || !i2c_is_ready_dt(&imu) || !gpio_is_ready_dt(&bin1) || !gpio_is_ready_dt(&bin2) || !pwm_is_ready_dt(&pwmb)) {
-        printk("BLAD: Sprzet nie jest gotowy!\n");
+        // printk("BLAD: Sprzet nie jest gotowy!\n");
 
         
         return 0;
@@ -41,7 +41,7 @@ int main(void)
 
    
 
-    printk("Main konczy prace, oddaje sterowanie do taskow!\n");
+
 
     return 0;
 }
