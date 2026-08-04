@@ -11,10 +11,10 @@ find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
 add_executable(vel_parser_node src/VelParserNode.cpp)
-ament_target_dependencies(vel_parser rclcpp geometry_msgs std_msgs)
+ament_target_dependencies(vel_parser_node rclcpp geometry_msgs std_msgs)
 
 install(TARGETS
-  vel_parser
+  vel_parser_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
