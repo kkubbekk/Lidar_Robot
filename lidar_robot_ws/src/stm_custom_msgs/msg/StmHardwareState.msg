@@ -4,6 +4,7 @@ float32 v_right_mps
 int64 accum_left_ticks
 int64 accum_right_ticks
 float32 motor_linear_speed
+float32 motor_angular_speed
 float32 imu_yaw
 float32 imu_roll
 float32 imu_pitch

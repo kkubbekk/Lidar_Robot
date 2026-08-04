@@ -15,11 +15,17 @@ extern atomic_t robot_state;
 #include <rcl/rcl.h>
 #include <rcl/error_handling.h>
 #include <std_msgs/msg/float32_multi_array.h>
+#include <rclc/rclc.h>
+#include <rclc/executor.h>
+
+#define STACK_SIZE 2048
+#define PRIORITY 5
 
 
 K_MSGQ_DEFINE(ros_msg, sizeof(ros_data_t), 5, 4);
 
-#include <rclc/rclc.h>
+
+
 #include <rclc/executor.h>
 
 rcl_allocator_t allocator;
@@ -48,8 +54,8 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
         //moto
         msg_tx.v_left_mps = moto_data.v_left_mps;
         msg_tx.v_right_mps = moto_data.v_right_mps;
-        msg_tx.accum_left_ticks = moto_data.accum_left_ticks;
-        msg_tx.accum_right_ticks = moto_data.accum_right_ticks;
+        msg_tx.accum_left_ticks = moto_data.acumulated_left_encoder_ticks;
+        msg_tx.accum_right_ticks = moto_data.acumulated_right_encoder_ticks;
         msg_tx.motor_angular_speed = moto_data.motor_angular_speed;
         msg_tx.motor_linear_speed = moto_data.robot_speed_mps;
         
@@ -72,6 +78,7 @@ void timer_callback(rcl_timer_t * timer, int64_t last_call_time)
     else{
         atomic_set(&robot_state,STATE_ROS_ERROR);
     }
+}
 
 
 
@@ -98,13 +105,13 @@ void subscription_callback(const void * msg_in)
 
       
     }
+
+
+
+
 }
 
-
-
-}
-
-void main(void)
+void microros_task(void *arg1, void *arg2, void *arg3)
 {
 
 
@@ -161,3 +168,4 @@ void main(void)
 }
 
  
+K_THREAD_DEFINE(microros_thread_id, STACK_SIZE, microros_task, NULL, NULL, NULL, PRIORITY, 0, 0);

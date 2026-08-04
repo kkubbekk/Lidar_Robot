@@ -1,5 +1,0 @@
-source;share/stm_custom_msgs/local_setup.bash
-source;share/stm_custom_msgs/local_setup.dsv
-source;share/stm_custom_msgs/local_setup.ps1
-source;share/stm_custom_msgs/local_setup.sh
-source;share/stm_custom_msgs/local_setup.zsh

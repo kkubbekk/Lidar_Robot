@@ -1,1 +1,0 @@
-Invoking command in '/home/kubekpc/Lidar_Robot/build/stm_custom_msgs': /usr/bin/cmake /home/kubekpc/Lidar_Robot/lidar_robot_ws/src/stm_custom_msgs -DCMAKE_INSTALL_PREFIX=/home/kubekpc/Lidar_Robot/install/stm_custom_msgs

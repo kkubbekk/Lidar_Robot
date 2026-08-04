@@ -24,3 +24,9 @@ zephyr/zephyr.dts.pre
 lidar_robot_ws/build/
 lidar_robot_ws/install/
 lidar_robot_ws/log/
+
+
+build/
+install/
+log/
+firmware_backup/

@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "/opt/ros/humble/share/rosidl_generator_py/cmake/../../../lib/rosidl_generator_py/rosidl_generator_py", line 8, in <module>
-    from rosidl_generator_py import generate_py
-ImportError: cannot import name 'generate_py' from 'rosidl_generator_py' (/opt/ros/humble/local/lib/python3.10/dist-packages/rosidl_generator_py/__init__.py)
-gmake[2]: *** [stm_custom_msgs__py/CMakeFiles/stm_custom_msgs__py.dir/build.make:93: rosidl_generator_py/stm_custom_msgs/_stm_custom_msgs_s.ep.rosidl_typesupport_fastrtps_c.c] Error 1
-gmake[1]: *** [CMakeFiles/Makefile2:609: stm_custom_msgs__py/CMakeFiles/stm_custom_msgs__py.dir/all] Error 2
-gmake: *** [Makefile:146: all] Error 2

@@ -1,2 +1,0 @@
-Invoking command in '/home/kubekpc/Lidar_Robot/build/testsilnika': /usr/bin/cmake /home/kubekpc/Lidar_Robot/firmware -DCMAKE_INSTALL_PREFIX=/home/kubekpc/Lidar_Robot/install/testsilnika
-Invoked command in '/home/kubekpc/Lidar_Robot/build/testsilnika' returned '1': /usr/bin/cmake /home/kubekpc/Lidar_Robot/firmware -DCMAKE_INSTALL_PREFIX=/home/kubekpc/Lidar_Robot/install/testsilnika
