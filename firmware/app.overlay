@@ -1,4 +1,9 @@
 /{
+
+    chosen {
+        zephyr,micro-ros-uart = &usart2;
+    };
+
     aliases {
         motor-ain1 = &ain1_pin;
         motor-ain2 = &ain2_pin;
@@ -48,6 +53,11 @@
             pwms = <&pwm2 3 100000 PWM_POLARITY_NORMAL>;
         };
     };
+};
+
+&usart2 {
+    status = "okay";
+    current-speed = <115200>;
 };
 
 &timers3 {
@@ -104,3 +114,4 @@
 &spi1 {
     status = "disabled";
 };
+

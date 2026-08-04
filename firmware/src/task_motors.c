@@ -58,7 +58,7 @@ K_TIMER_DEFINE(motor_sample_timer,NULL,NULL);
 //queue definition
 K_MSGQ_DEFINE(motor_msg, sizeof(motor_sample_t), 5, 4);
 
-void set_velocity_motor(int32_t target_velocity_ignoruj_to, struct gpio_dt_spec* in1, struct gpio_dt_spec* in2, const struct pwm_dt_spec* pwm, int32_t pwm_pid_value)
+void set_velocity_motor(struct gpio_dt_spec* in1, struct gpio_dt_spec* in2, const struct pwm_dt_spec* pwm, int32_t pwm_pid_value)
 {
     
     if(pwm_pid_value > 0) { 
@@ -160,7 +160,7 @@ void motor_task(void *arg1, void *arg2, void *arg3)
 
      int64_t last_time_ms = k_uptime_get();
 
-     // Przed pętlą while(1) - odczyt startowy, żeby nie mieć skoku od 0
+  
     
     //zczytanie zeby uniknac skoku od 0
     sensor_sample_fetch(encoder_left);
@@ -168,15 +168,35 @@ void motor_task(void *arg1, void *arg2, void *arg3)
     sensor_sample_fetch(encoder_right);
     sensor_channel_get(encoder_right, SENSOR_CHAN_ROTATION, &right_position_actual);
 
+    //ros data struct
+    extern struct k_msgq ros_msg;
+
+    ros_data_t ros_motor_data = {0};
 
 while (1) {
 
+        int ret = k_msgq_get(&ros_msg, &ros_motor_data, K_NO_WAIT);
+        
+        if(ret == 0)
+        {
+          
+          
+        }
+        else{
+            set_velocity_motor(&ain1,&ain2,&pwma,0);
+            set_velocity_motor(&bin1,&bin2,&pwmb,0);
+            k_timer_status_sync(&motor_sample_timer);
+           
+        }
+
+
+        //state check
         robot_state_t current_state = (robot_state_t)atomic_get(&robot_state);
         
         if(current_state == STATE_TIPPED || current_state == STATE_SENSOR_ERROR || current_state == STATE_MOTOR_FAULT)
         {
-            set_velocity_motor(0,&ain1,&ain2,&pwma,0);
-            set_velocity_motor(0,&bin1,&bin2,&pwmb,0);
+            set_velocity_motor(&ain1,&ain2,&pwma,0);
+            set_velocity_motor(&bin1,&bin2,&pwmb,0);
             k_timer_status_sync(&motor_sample_timer);
             continue;
         }
@@ -192,7 +212,7 @@ while (1) {
         if(err_left == 0) {
             sensor_channel_get(encoder_left, SENSOR_CHAN_ROTATION, &left_position_actual);
         } else {
-            printk("Blad odczytu LEWEGO enkodera\n");
+            // printk("Blad odczytu LEWEGO enkodera\n");
         }
 
         // ODCZYT PRAWEGO
@@ -200,13 +220,13 @@ while (1) {
         if(err_right == 0) {
             sensor_channel_get(encoder_right, SENSOR_CHAN_ROTATION, &right_position_actual);
         } else {
-            printk("Blad odczytu PRAWEGO enkodera\n");
+            // printk("Blad odczytu PRAWEGO enkodera\n");
         }
         
 
-        // na debug
-        printk("Left Encoder: Val1: %d | Val2: %d\n", left_position_actual.val1, left_position_actual.val2);
-        printk("Right Encoder: Val1: %d | Val2: %d\n", right_position_actual.val1, right_position_actual.val2);
+        // // na debug
+        // printk("Left Encoder: Val1: %d | Val2: %d\n", left_position_actual.val1, left_position_actual.val2);
+        // printk("Right Encoder: Val1: %d | Val2: %d\n", right_position_actual.val1, right_position_actual.val2);
 
         int64_t now_ms = k_uptime_get();
         
@@ -227,27 +247,21 @@ while (1) {
        float raw_v_left = calculate_linear_speed(delta_left, dt_ms);
        float raw_v_right = calculate_linear_speed(delta_right, dt_ms);
 
-    //    filtered_v_left  = (0.2f * raw_v_left)  + (0.8f * filtered_v_left);
-    //    filtered_v_right = (0.2f * raw_v_right) + (0.8f * filtered_v_right);
 
-        float target_v_left = 150.5f;   // testowo, na sztywno
-        float target_v_right = 200.5f;  // testowo, na sztywno
+        float pwm_left  = calculate_pid_and_set_pwm(raw_v_left,ros_motor_data.v_left,&pid_left, dt_ms);
+        float pwm_right  = calculate_pid_and_set_pwm(raw_v_right,ros_motor_data.v_right, &pid_right, dt_ms);
 
-   
-        float pwm_left  = calculate_pid_and_set_pwm(raw_v_left, target_v_left, &pid_left, dt_ms);
-        float pwm_right  = calculate_pid_and_set_pwm(raw_v_right, target_v_right, &pid_right, dt_ms);
-
-        set_velocity_motor((int32_t)(target_v_left*1000), &ain1, &ain2, &pwma, (int32_t)pwm_left);
-        set_velocity_motor((int32_t)(target_v_right*1000), &bin1, &bin2, &pwmb, (int32_t)pwm_right);
+        set_velocity_motor(&ain1, &ain2, &pwma,pwm_left);
+        set_velocity_motor(&bin1, &bin2, &pwmb,pwm_right);
 
         motor_data.v_left_mps = raw_v_left;
-    motor_data.v_right_mps = raw_v_right;
+        motor_data.v_right_mps = raw_v_right;
 
-        printk("L: now=%.2f target=%.2f pwm=%.0f | R: now=%.2f target=%.2f pwm=%.0f\n",
-    (double)motor_data.v_left_mps, (double)target_v_left, (double)pwm_left,
-    (double)motor_data.v_right_mps, (double)target_v_right, (double)pwm_right);
+        // printk("L: now=%.2f target=%.2f pwm=%.0f | R: now=%.2f target=%.2f pwm=%.0f\n",
+    // (double)motor_data.v_left_mps, (double)target_v_left, (double)pwm_left,
+    // (double)motor_data.v_right_mps, (double)target_v_right, (double)pwm_right);
 
-    printk("state: %d\n", current_state);
+    // printk("state: %d\n", current_state);
 
         motor_data.acumulated_left_encoder_ticks  += delta_left;
         motor_data.acumulated_right_encoder_ticks += delta_right;

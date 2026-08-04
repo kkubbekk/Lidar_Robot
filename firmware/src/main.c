@@ -20,7 +20,7 @@
 
  atomic_t robot_state = ATOMIC_INIT(STATE_OKAY); // inicjalizujemy stan poczatkowy robotaja na ok;
 
-
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 
 int main(void)
 {
@@ -45,3 +45,20 @@ int main(void)
 
     return 0;
 }
+
+
+
+
+
+void heartbeat_task(void *a1, void *a2, void *a3)
+{
+    if (!gpio_is_ready_dt(&led)) {
+        for(;;) { k_msleep(1000); } // nawet tu nie dojdzie jesli hardfault wczesniej
+    }
+    gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
+    for (;;) {
+        gpio_pin_toggle_dt(&led);
+        k_msleep(300);
+    }
+}
+K_THREAD_DEFINE(heartbeat_id, 512, heartbeat_task, NULL, NULL, NULL, 5, 0, 0);

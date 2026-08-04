@@ -47,7 +47,7 @@ void task_imu(void *arg1,void *arg2,void *arg3)
     if(!imu_turn_on())
     {
       //doda sie state machine ogolnie 
-      printk("Blad wlaczenia czujnika!\n");
+      // printk("Blad wlaczenia czujnika!\n");
     }
 
      
@@ -90,17 +90,10 @@ void task_imu(void *arg1,void *arg2,void *arg3)
            }
            
     }
-     
-      
-       
-       
-
-    k_timer_status_sync(&imu_sample_timer);
-      
-  
-  
   }
-    
    
+    
+    k_timer_status_sync(&imu_sample_timer);
   }
+ 
 }
