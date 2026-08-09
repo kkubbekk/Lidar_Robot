@@ -9,12 +9,26 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(stm_custom_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+
 
 add_executable(vel_parser_node src/VelParserNode.cpp)
 ament_target_dependencies(vel_parser_node rclcpp geometry_msgs std_msgs)
 
+
+add_executable(mock_stm_node src/MockStmNode.cpp)
+ament_target_dependencies(mock_stm_node rclcpp stm_custom_msgs)
+
+add_executable(stm_parser_node src/StmParserNode.cpp)
+ament_target_dependencies(stm_parser_node rclcpp geometry_msgs nav_msgs stm_custom_msgs tf2 tf2_ros)
+
 install(TARGETS
   vel_parser_node
+  mock_stm_node
+  stm_parser_node
   DESTINATION lib/${PROJECT_NAME}
 )
 
