@@ -89,7 +89,7 @@ class StmParserNode : public rclcpp::Node
 
             tf2::Quaternion q;
 
-            q.setRPY(0.0,0.0,msg->imu_yaw);
+            q.setRPY(0.0,0.0,yaw_rad);
 
             odom_msg.pose.pose.orientation.x = q.x();
             odom_msg.pose.pose.orientation.y = q.y();

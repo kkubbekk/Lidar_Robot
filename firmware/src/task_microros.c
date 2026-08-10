@@ -173,12 +173,26 @@ if (transport_ret != RMW_RET_OK) {
         rclc_executor_add_subscription(&executor, &subscriber, &msg_rx, &subscription_callback, ON_NEW_DATA);
         rclc_executor_add_timer(&executor, &timer);
 
-     
-       
-        while (rmw_uros_ping_agent(10, 1) == RMW_RET_OK) {
+        int ping_counter=0;
+        while(1)
+        {   
             rclc_executor_spin_some(&executor, RCL_MS_TO_NS(10));
             k_msleep(10); 
+
+            ping_counter++;
+
+            if(ping_counter>=100)
+            {
+                if(rmw_uros_ping_agent(10, 1) != RMW_RET_OK) {
+            break;
+            }
+            ping_counter=0;
+            }
+            
+
         }
+        
+       
 
       
         rclc_executor_fini(&executor);

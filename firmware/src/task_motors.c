@@ -1,12 +1,12 @@
 #define STACK_SIZE 1024
 #define PRIORITY 4
 #define SAMPLE_PERIOD_MS 10
-#define WHEEL_BASE_MM 400
+#define WHEEL_BASE_MM 350
 #define WHEEL_RADIUS_MM 65
 #define PWM_PERIOD_NS 100000
-#define KP 0.15f
-#define KI 0.03f
-#define KD 0.00f
+#define KP 65.0f
+#define KI 35.0f
+#define KD 0.0f
 
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
@@ -108,7 +108,13 @@ float calculate_robot_speed(float v_left,float v_right)
 }
 
 float calculate_pid_and_set_pwm(float v_now,float v_target,pid_state_t* pid_state,int64_t dt_ms)
-{
+{   
+    if(fabs(v_target)<0.01f)
+    {
+        pid_state->integral = 0.0f;
+        pid_state->prev_error = 0.0f;
+        return 0.0f;
+    }
     float error = v_target-v_now;
     float dt_s = dt_ms/1000.0f;
     //kp
@@ -117,8 +123,10 @@ float calculate_pid_and_set_pwm(float v_now,float v_target,pid_state_t* pid_stat
     //ki
     pid_state->integral += error *dt_s;
     
-    if(pid_state->integral > 2000.0f) pid_state->integral = 2000.0f;
-    if(pid_state->integral < -2000.0f) pid_state->integral = -2000.0f;
+    float max_integral = 100.0f / KI;
+    
+    if(pid_state->integral > max_integral) pid_state->integral = max_integral;
+    if(pid_state->integral < -max_integral) pid_state->integral = -max_integral;
 
     float k_i = KI*pid_state->integral;
 
@@ -127,6 +135,8 @@ float calculate_pid_and_set_pwm(float v_now,float v_target,pid_state_t* pid_stat
 
     pid_state->prev_error = error;
     float pwm_percent = k_p + k_i + k_d; // BEZ fabs()!
+
+  
 
     if(pwm_percent > 100.0f) pwm_percent = 100.0f;
     if(pwm_percent < -100.0f) pwm_percent = -100.0f;
@@ -173,21 +183,26 @@ void motor_task(void *arg1, void *arg2, void *arg3)
 
     ros_data_t ros_motor_data = {0};
 
-while (1) {
+    static int timeout_counter =0;
 
+while (1) {
+   
         int ret = k_msgq_get(&ros_msg, &ros_motor_data, K_NO_WAIT);
         
-        if(ret == 0)
-        {
-          
-          
+        if(ret == 0) {
+           timeout_counter = 0;
+            
         }
         else{
-            set_velocity_motor(&ain1,&ain2,&pwma,0);
-            set_velocity_motor(&bin1,&bin2,&pwmb,0);
-            k_timer_status_sync(&motor_sample_timer);
-           
+            timeout_counter++;
         }
+        if(timeout_counter>=50)
+        {
+            ros_motor_data.v_left=0.0f;
+            ros_motor_data.v_right=0.0f;
+            timeout_counter=50;
+        }
+  
 
 
         //state check
@@ -232,6 +247,9 @@ while (1) {
         
         int64_t dt_ms = (now_ms-last_time_ms);
 
+
+        if (dt_ms <= 0) dt_ms = 1;
+        
         last_time_ms = now_ms;
 
         int32_t delta_left  = unwrap_delta_millideg(&left_position_actual, &left_position_last);
@@ -248,14 +266,22 @@ while (1) {
        float raw_v_right = calculate_linear_speed(delta_right, dt_ms);
 
 
-        float pwm_left  = calculate_pid_and_set_pwm(raw_v_left,ros_motor_data.v_left,&pid_left, dt_ms);
-        float pwm_right  = calculate_pid_and_set_pwm(raw_v_right,ros_motor_data.v_right, &pid_right, dt_ms);
+
+
+        float alpha = 0.08f; 
+        filtered_v_left = (alpha * raw_v_left) + ((1.0f - alpha) * filtered_v_left);
+        filtered_v_right = (alpha * raw_v_right) + ((1.0f - alpha) * filtered_v_right);
+
+    
+       
+        float pwm_left  = calculate_pid_and_set_pwm(filtered_v_left, ros_motor_data.v_left, &pid_left, dt_ms);
+        float pwm_right = calculate_pid_and_set_pwm(filtered_v_right, ros_motor_data.v_right, &pid_right, dt_ms);
 
         set_velocity_motor(&ain1, &ain2, &pwma,pwm_left);
         set_velocity_motor(&bin1, &bin2, &pwmb,pwm_right);
 
-        motor_data.v_left_mps = raw_v_left;
-        motor_data.v_right_mps = raw_v_right;
+        motor_data.v_left_mps = filtered_v_left;
+        motor_data.v_right_mps = filtered_v_right;
 
         // printk("L: now=%.2f target=%.2f pwm=%.0f | R: now=%.2f target=%.2f pwm=%.0f\n",
     // (double)motor_data.v_left_mps, (double)target_v_left, (double)pwm_left,

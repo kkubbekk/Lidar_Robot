@@ -1,4 +1,4 @@
-#define axis_length 350
+#define axis_length 0.35
 // #define wheel_radius
 
 
@@ -44,7 +44,7 @@ public:
         motor_data_t data;
 
         float angular_velocity = msg->angular.z;
-        float linear_velocity = msg->linear.x*1000.0;
+        float linear_velocity = msg->linear.x;
 
 
         float v_left =  linear_velocity - (angular_velocity*(axis_length/2.0));
