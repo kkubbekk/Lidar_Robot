@@ -94,7 +94,7 @@ int32_t unwrap_delta_millideg(struct sensor_value* actual_val, struct sensor_val
 
 float calculate_linear_speed(int32_t delta_millideg, int64_t time_period_ms)
 {
-    return (float)delta_millideg / 360000.0f * 1000.0f / time_period_ms * 2 * WHEEL_RADIUS_MM * M_PI;
+    return (((float)delta_millideg / 360000.0f) * (1000.0f / (float)time_period_ms) * (2.0f * WHEEL_RADIUS_MM * M_PI)) / 1000.0f;
 }
 
 

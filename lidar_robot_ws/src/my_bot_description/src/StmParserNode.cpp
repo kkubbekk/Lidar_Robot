@@ -5,6 +5,7 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/transform_broadcaster.h"
 #include "geometry_msgs/msg/transform_stamped.hpp"
+#include <cmath>
 
 using std::placeholders::_1;
 
@@ -59,18 +60,20 @@ class StmParserNode : public rclcpp::Node
             if(dt<0) return;
 
 
-            float avg_v_left =  (msg->v_left_mps + last_value_subscription->v_left_mps)/2.0f;
-            float avg_v_right = (msg->v_right_mps + last_value_subscription->v_right_mps)/2.0f;
+            double avg_v_left =  (msg->v_left_mps + last_value_subscription->v_left_mps)/2.0f;
+            double avg_v_right = (msg->v_right_mps + last_value_subscription->v_right_mps)/2.0f;
 
 
             //narazie czytamy kat z imu pozniej se poczytam o filtrze kalmana i sproboje to dodac z imu oraz enkoder
             // float delta_angle = msg->imu_yaw - last_value_subscription->imu_yaw;
             float length_driven = (avg_v_left + avg_v_right)/2.0f*dt;
 
-            float angular_vel_avg = (msg->motor_angular_speed -last_value_subscription->motor_angular_speed)/2.0f;
+            float angular_vel_avg = (msg->motor_angular_speed + last_value_subscription->motor_angular_speed)/2.0f;
 
-            total_x += length_driven*cos(msg->imu_yaw);
-            total_y += length_driven*sin(msg->imu_yaw);
+            double yaw_rad = msg->imu_yaw * (M_PI / 180.0);
+
+            total_x += length_driven*cos(yaw_rad);
+            total_y += length_driven*sin(yaw_rad);
 
             RCLCPP_INFO(this->get_logger(), "Odometria -> X: %.3f m | Y: %.3f m | Kąt: %.2f rad", total_x, total_y,msg->imu_yaw);
 
