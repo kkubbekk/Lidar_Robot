@@ -70,12 +70,13 @@ class StmParserNode : public rclcpp::Node
 
             float angular_vel_avg = (msg->motor_angular_speed + last_value_subscription->motor_angular_speed)/2.0f;
 
-            double yaw_rad = msg->imu_yaw * (M_PI / 180.0);
+
+            double yaw_rad = KalmanFilter_1D(msg,dt);
 
             total_x += length_driven*cos(yaw_rad);
             total_y += length_driven*sin(yaw_rad);
 
-            RCLCPP_INFO(this->get_logger(), "Odometria -> X: %.3f m | Y: %.3f m | Kąt: %.2f rad", total_x, total_y,msg->imu_yaw);
+            RCLCPP_INFO(this->get_logger(), "Odometria -> X: %.3f m | Y: %.3f m | Kąt: %.2f rad", total_x, total_y,yaw_rad);
 
             nav_msgs::msg::Odometry odom_msg;
 
@@ -120,27 +121,33 @@ class StmParserNode : public rclcpp::Node
 
           }
 
+          double angle = 0.0f;
+          double raw_encoder_angle = 0.0f;
+          float P = 0.02 // na probe
+          float Q = 0.03;
+          float R = 0.1f;
+          float K;
 
-          //proba kalman ale to jeszcze musze poczytac moze zrobie 2d filter nie wiem 
+          double KalmanFilter_1D(const stm_custom_msgs::msg::StmHardwareState::SharedPtr &msg,float dt)
+            {
+             
+              float imu_yaw_rad = msg->imu_yaw * (M_PI / 180.0f);
 
-          // //jakies wartosci z dupy zeby zobaczyc logike
-          // float p =0.2; 
-          // float q=0.1
-          // float angle =0;
-          // float r = 0.02;
-          // float k_gain;
-          
-          // void kalman_filter_1D(const stm_custom_msgs::msg::StmHardwareState::SharedPtr msg)
-          // {
-          //   //angular
-          //   angle = angle + (msg->motor_angular_velocity*msg->time_stamp);
-          //   p=p+q;
-          //   k_gain = p/(p+r)
+              angle = angle + (msg->motor_angular_speed * dt);
+             
+              P = P + Q;
+              
+              K = P / (P + R);
+              angle = angle + K * (imu_yaw_rad - angle);
+              P = (1.0f - K) * P;
 
-          //   angle = angle + K * (msg->imu_yaw - angle);
-          //   p=(1-K)*P;
-            
-          //   //pozniej jakies returnowanie i publioshowanie to przed trzbea bedzie zmienic update odom
+              return angle;
+            }
+
+          double calculate_enc_angle(const stm_custom_msgs::msg::StmHardwareState::SharedPtr &msg)
+          {
+            return (msg->accum_left_ticks - msg->accum_right_ticks)/1000.0f;
+          }
           
 };
 
