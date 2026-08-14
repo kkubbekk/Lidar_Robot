@@ -49,16 +49,3 @@ int main(void)
 
 
 
-
-void heartbeat_task(void *a1, void *a2, void *a3)
-{
-    if (!gpio_is_ready_dt(&led)) {
-        for(;;) { k_msleep(1000); } // nawet tu nie dojdzie jesli hardfault wczesniej
-    }
-    gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
-    for (;;) {
-        gpio_pin_toggle_dt(&led);
-        k_msleep(300);
-    }
-}
-K_THREAD_DEFINE(heartbeat_id, 512, heartbeat_task, NULL, NULL, NULL, 5, 0, 0);

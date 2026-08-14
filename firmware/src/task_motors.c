@@ -4,8 +4,8 @@
 #define WHEEL_BASE_MM 350
 #define WHEEL_RADIUS_MM 65
 #define PWM_PERIOD_NS 100000
-#define KP 65.0f
-#define KI 35.0f
+#define KP 150.0f
+#define KI 100.0f
 #define KD 0.0f
 
 #include <zephyr/kernel.h>
@@ -100,7 +100,7 @@ float calculate_linear_speed(int32_t delta_millideg, int64_t time_period_ms)
 
 float calculate_angular_speed(float v_left,float v_right,int64_t time_period)
 {
-    return(v_right-v_left)/WHEEL_BASE_MM;
+    return (v_right - v_left) / (WHEEL_BASE_MM / 1000.0f);
 }
 float calculate_robot_speed(float v_left,float v_right)
 {
@@ -255,11 +255,11 @@ while (1) {
         int32_t delta_left  = unwrap_delta_millideg(&left_position_actual, &left_position_last);
         int32_t delta_right = unwrap_delta_millideg(&right_position_actual, &right_position_last);
 
-        //jnesli kola robota stoja 
-        //i dojdzie tu if jesli zadana predkosc jest wieksza niz zero ale to juz po implementacji rosowej
-        // if(abs(delta_right)<50 || abs(delta_left)<50)
+        // jnesli kola robota stoja 
+        // i dojdzie tu if jesli zadana predkosc jest wieksza niz zero ale to juz po implementacji rosowej
+        // if ( (abs(delta_right) < 50 && abs(delta_left) < 50) &&  (fabs(ros_motor_data.v_left) > 0.1 || fabs(ros_motor_data.v_right) > 0.1) )
         // {
-        //     atomic_set(&robot_state,STATE_MOTOR_FAULT);
+        //     atomic_set(&robot_state, STATE_MOTOR_FAULT);
         // }
 
        float raw_v_left = calculate_linear_speed(delta_left, dt_ms);
@@ -268,7 +268,7 @@ while (1) {
 
 
 
-        float alpha = 0.08f; 
+        float alpha = 0.25;
         filtered_v_left = (alpha * raw_v_left) + ((1.0f - alpha) * filtered_v_left);
         filtered_v_right = (alpha * raw_v_right) + ((1.0f - alpha) * filtered_v_right);
 

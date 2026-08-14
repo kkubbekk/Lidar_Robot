@@ -123,7 +123,7 @@ class StmParserNode : public rclcpp::Node
 
           double angle = 0.0f;
           double raw_encoder_angle = 0.0f;
-          float P = 0.02 // na probe
+          float P = 0.02;// na probe
           float Q = 0.03;
           float R = 0.1f;
           float K;

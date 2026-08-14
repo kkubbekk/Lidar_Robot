@@ -17,6 +17,8 @@
 
     };
 
+
+
     leds {
         compatible = "gpio-leds";
         ain1_pin: ain1 {
@@ -115,3 +117,20 @@
     status = "disabled";
 };
 
+    &pinctrl {
+   
+    tim3_ch1_pa6: tim3_ch1_pa6 {
+        bias-pull-up;
+    };
+    tim3_ch2_pa7: tim3_ch2_pa7 {
+        bias-pull-up;
+    };
+
+
+    tim4_ch1_pb6: tim4_ch1_pb6 {
+        bias-pull-up;
+    };
+    tim4_ch2_pb7: tim4_ch2_pb7 {
+        bias-pull-up;
+    };
+};
