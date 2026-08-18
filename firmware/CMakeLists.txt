@@ -14,6 +14,7 @@ target_sources(app PRIVATE
     src/imu.c
     src/imu.h
     src/task_microros.c
+    src/task_meas.c
 )
 
 target_link_libraries(app PRIVATE microros)

@@ -18,7 +18,7 @@ extern atomic_t robot_state;
 void task_imu(void *arg1,void *arg2,void *arg3);
 
 //task definition
-K_THREAD_DEFINE(imu_thread_id, STACK_SIZE, task_imu, NULL, NULL, NULL, PRIORITY, 0, 0);
+// K_THREAD_DEFINE(imu_thread_id, STACK_SIZE, task_imu, NULL, NULL, NULL, PRIORITY, 0, 0);
 
 //timer to better synchronize
 K_TIMER_DEFINE(imu_sample_timer,NULL,NULL);

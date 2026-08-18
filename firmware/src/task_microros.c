@@ -201,9 +201,9 @@ if (transport_ret != RMW_RET_OK) {
         rcl_timer_fini(&timer);
         rcl_node_fini(&node);
         rclc_support_fini(&support);
-        
+         
        
     }
 }
 
-K_THREAD_DEFINE(microros_thread_id, STACK_SIZE, microros_task, NULL, NULL, NULL, PRIORITY, 0, 0);
+// K_THREAD_DEFINE(microros_thread_id, STACK_SIZE, microros_task, NULL, NULL, NULL, PRIORITY, 0, 0);

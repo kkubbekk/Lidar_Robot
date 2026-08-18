@@ -1,7 +1,10 @@
 /{
-
     chosen {
         zephyr,micro-ros-uart = &usart2;
+    };
+
+    zephyr,user {
+        io-channels = <&adc1 2>;
     };
 
     aliases {
@@ -14,10 +17,7 @@
         encoder-left = &qdec_l;
         encoder-right = &qdec_r;
         imu = &bno055;
-
     };
-
-
 
     leds {
         compatible = "gpio-leds";
@@ -40,18 +40,15 @@
         button1: button1 {
             gpios = <&gpioc 13 GPIO_ACTIVE_LOW>;
             label = "Button 1";
-            // linux,code = <28>;
         };
     };
 
     pwm_motors {
         compatible = "pwm-leds";
         pwma_pin: pwma {
-            /* 100 000 nanosekund = 10 kHz */
             pwms = <&pwm2 2 100000 PWM_POLARITY_NORMAL>;
         };
-        pwmb_pin:pwmb {
-            /* 100 000 nanosekund = 10 kHz */
+        pwmb_pin: pwmb {
             pwms = <&pwm2 3 100000 PWM_POLARITY_NORMAL>;
         };
     };
@@ -132,5 +129,24 @@
     };
     tim4_ch2_pb7: tim4_ch2_pb7 {
         bias-pull-up;
+    };
+
+    adc1_in2_pc1: adc1_in2_pc1 {
+        pinmux = <STM32_PINMUX('C', 1, ANALOG)>;
+    };
+};
+&adc1 {
+    status = "okay";
+    pinctrl-0 = <&adc1_in2_pc1>;
+    pinctrl-names = "default";
+    #address-cells = <1>;
+    #size-cells = <0>;
+
+    channel@2 {
+        reg = <2>;
+        zephyr,gain = "ADC_GAIN_1";
+        zephyr,reference = "ADC_REF_INTERNAL";
+        zephyr,acquisition-time = <ADC_ACQ_TIME(ADC_ACQ_TIME_TICKS, 640)>;
+        zephyr,resolution = <12>;
     };
 };

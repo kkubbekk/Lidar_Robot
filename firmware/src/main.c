@@ -4,7 +4,10 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/devicetree.h>
 #include <zephyr/drivers/i2c.h>
+#include <zephyr/drivers/adc.h>
 #include "shared_data.h"
+
+#define ADC_NODE DT_ALIAS(adc1)
 
 //aliasy
  const struct gpio_dt_spec ain1 = GPIO_DT_SPEC_GET(DT_ALIAS(motor_ain1), gpios);
@@ -17,6 +20,7 @@
  const struct device *const encoder_left = DEVICE_DT_GET(DT_ALIAS(encoder_left));
  const struct device *const encoder_right = DEVICE_DT_GET(DT_ALIAS(encoder_right));
  const struct i2c_dt_spec imu = I2C_DT_SPEC_GET(DT_ALIAS(imu));
+
 
  atomic_t robot_state = ATOMIC_INIT(STATE_OKAY); // inicjalizujemy stan poczatkowy robotaja na ok;
 
