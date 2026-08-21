@@ -5,12 +5,10 @@
     };
 
     aliases {
-        motor-ain1 = &ain1_pin;
-        motor-ain2 = &ain2_pin;
-        motor-bin1 = &bin1_pin;
-        motor-bin2 = &bin2_pin;
-        motor-pwma = &pwma_pin;
-        motor-pwmb = &pwmb_pin;
+        pwm-left-in1 = &left_motor_pwm_in1;
+        pwm-left-in2 = &left_motor_pwm_in2;
+        pwm-right-in1 = &right_motor_pwm_in1;
+        pwm-right-in2 = &right_motor_pwm_in2;
         encoder-left = &qdec_l;
         encoder-right = &qdec_r;
         imu = &bno055;
@@ -18,22 +16,6 @@
     };
 
 
-
-    leds {
-        compatible = "gpio-leds";
-        ain1_pin: ain1 {
-            gpios = <&gpioa 0 GPIO_ACTIVE_HIGH>;
-        };
-        ain2_pin: ain2 {
-            gpios = <&gpioa 4 GPIO_ACTIVE_HIGH>;
-        };
-        bin1_pin: bin1 {
-            gpios = <&gpioc 6 GPIO_ACTIVE_HIGH>;
-        };
-        bin2_pin: bin2 {
-            gpios = <&gpioc 5 GPIO_ACTIVE_HIGH>;
-        };
-    };
 
     gpio_keys {
         compatible = "gpio-keys";
@@ -45,16 +27,25 @@
     };
 
     pwm_motors {
+        
         compatible = "pwm-leds";
-        pwma_pin: pwma {
-            /* 100 000 nanosekund = 10 kHz */
-            pwms = <&pwm2 2 100000 PWM_POLARITY_NORMAL>;
-        };
-        pwmb_pin:pwmb {
-            /* 100 000 nanosekund = 10 kHz */
-            pwms = <&pwm2 3 100000 PWM_POLARITY_NORMAL>;
-        };
+    
+    left_motor_pwm_in1: left_in1 {
+        pwms = <&pwm2 1 100000 PWM_POLARITY_NORMAL>;
     };
+        
+    left_motor_pwm_in2: left_in2 {
+        pwms = <&pwm2 2 100000 PWM_POLARITY_NORMAL>;
+    };
+    
+    right_motor_pwm_in1: right_in1 {
+        pwms = <&pwm2 3 100000 PWM_POLARITY_NORMAL>;
+    };
+    
+    right_motor_pwm_in2: right_in2 {
+        pwms = <&pwm2 4 100000 PWM_POLARITY_NORMAL>;
+    };
+};
 };
 
 &usart2 {
@@ -97,7 +88,7 @@
 
 &pwm2 {
     status = "okay";
-    pinctrl-0 = <&tim2_ch2_pa1 &tim2_ch3_pb10>;
+    pinctrl-0 = <&tim2_ch1_pa0 &tim2_ch2_pa1 &tim2_ch3_pb10 &tim2_ch4_pb11>;
     pinctrl-names = "default";
 };
 

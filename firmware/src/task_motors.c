@@ -43,14 +43,16 @@ extern const struct device *const encoder_right;
 
 //motor pwm struct
 
-extern const struct pwm_dt_spec pwma;
-extern const struct pwm_dt_spec pwmb;
+extern const struct pwm_dt_spec pwm_left_in1;
+extern const struct pwm_dt_spec pwm_left_in2;
+extern const struct pwm_dt_spec pwm_right_in1;
+extern const struct pwm_dt_spec pwm_right_in2;
 
-//ain1,ain2,bin1,bin2
-extern const struct gpio_dt_spec ain1;
-extern const struct gpio_dt_spec ain2;
-extern const struct gpio_dt_spec bin1;
-extern const struct gpio_dt_spec bin2;
+
+//motor pins
+
+
+
 
 //TIMER  to better synchornize 
 K_TIMER_DEFINE(motor_sample_timer,NULL,NULL);
@@ -58,25 +60,29 @@ K_TIMER_DEFINE(motor_sample_timer,NULL,NULL);
 //queue definition
 K_MSGQ_DEFINE(motor_msg, sizeof(motor_sample_t), 5, 4);
 
-void set_velocity_motor(struct gpio_dt_spec* in1, struct gpio_dt_spec* in2, const struct pwm_dt_spec* pwm, int32_t pwm_pid_value)
+void set_velocity_motor(const struct pwm_dt_spec* pwm_in1, const struct pwm_dt_spec* pwm_in2, int32_t pwm_pid_value)
 {
+
+    int32_t duty_cycle = abs(pwm_pid_value) * PWM_PERIOD_NS / 100;
     
     if(pwm_pid_value > 0) { 
-        gpio_pin_set_dt(in1, 1);
-        gpio_pin_set_dt(in2, 0);
+         pwm_set_dt(pwm_in1, PWM_PERIOD_NS, duty_cycle);
+         pwm_set_dt(pwm_in2, PWM_PERIOD_NS, 0);
     }
     else if(pwm_pid_value < 0) { 
-        gpio_pin_set_dt(in1, 0);
-        gpio_pin_set_dt(in2, 1);
+       pwm_set_dt(pwm_in1, PWM_PERIOD_NS, 0);
+       pwm_set_dt(pwm_in2, PWM_PERIOD_NS, duty_cycle);
     }
-    else {
-        gpio_pin_set_dt(in1, 0);
-        gpio_pin_set_dt(in2, 0);
+    else
+    {
+       pwm_set_dt(pwm_in1, PWM_PERIOD_NS, 0);
+       pwm_set_dt(pwm_in2, PWM_PERIOD_NS, 0);
     }
     
+    
+    
    
-    int32_t duty_cycle = abs(pwm_pid_value) * PWM_PERIOD_NS / 100;
-    pwm_set_dt(pwm, PWM_PERIOD_NS, duty_cycle);
+   
 }
 
 int32_t unwrap_delta_millideg(struct sensor_value* actual_val, struct sensor_value* last_val)
@@ -134,7 +140,7 @@ float calculate_pid_and_set_pwm(float v_now,float v_target,pid_state_t* pid_stat
     float k_d = (dt_s > 0.0f) ? (error - pid_state->prev_error) * KD / dt_s : 0.0f;
 
     pid_state->prev_error = error;
-    float pwm_percent = k_p + k_i + k_d; // BEZ fabs()!
+    float pwm_percent = k_p + k_i + k_d; 
 
   
 
@@ -210,8 +216,8 @@ while (1) {
         
         if(current_state == STATE_TIPPED || current_state == STATE_SENSOR_ERROR || current_state == STATE_MOTOR_FAULT)
         {
-            set_velocity_motor(&ain1,&ain2,&pwma,0);
-            set_velocity_motor(&bin1,&bin2,&pwmb,0);
+            set_velocity_motor(&pwm_left_in1,&pwm_left_in2,0);
+             set_velocity_motor(&pwm_right_in1,&pwm_right_in2,0);
             k_timer_status_sync(&motor_sample_timer);
             continue;
         }
@@ -277,8 +283,17 @@ while (1) {
         float pwm_left  = calculate_pid_and_set_pwm(filtered_v_left, ros_motor_data.v_left, &pid_left, dt_ms);
         float pwm_right = calculate_pid_and_set_pwm(filtered_v_right, ros_motor_data.v_right, &pid_right, dt_ms);
 
-        set_velocity_motor(&ain1, &ain2, &pwma,pwm_left);
-        set_velocity_motor(&bin1, &bin2, &pwmb,pwm_right);
+        // set_velocity_motor(&pwm_left_in1, &pwm_left_in2,pwm_left);
+        // set_velocity_motor(&pwm_right_in1, &pwm_right_in2,pwm_right);
+
+        uint32_t period_ns = 100000;
+    uint32_t duty_50   = 50000;  // 50 000 ns to połowa ze 100 000 (czyli 50% mocy)
+
+    // 1. Jazda do przodu (IN1 dostaje PWM, IN2 dostaje 0)
+    printk("Jazda do przodu...\n");
+    pwm_set_dt(&pwm_left_in1, period_ns, duty_50);
+    pwm_set_dt(&pwm_left_in2, period_ns, 0);
+    k_msleep(2000); // Czekamy 2 sekundy
 
         motor_data.v_left_mps = filtered_v_left;
         motor_data.v_right_mps = filtered_v_right;
