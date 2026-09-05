@@ -22,4 +22,4 @@ A custom differential drive mobile robot bridging ROS 2 high-level control with 
 * **PCB:** Design a custom power and logic distribution board.
 * **Power Management:** Implement a 1-Wire Dallas bypass to resolve Dell BIOS CPU throttling.
 * **Navigation:** Assemble the physical chassis and configure the Nav2 stack.
-* **Camera:** Add Xbox360 Kinnect to add vision.
+* **Camera:** Add Xbox360 Kinnect for vision.
