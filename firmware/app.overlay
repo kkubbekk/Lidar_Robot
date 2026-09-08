@@ -12,6 +12,7 @@
         encoder-left = &qdec_l;
         encoder-right = &qdec_r;
         imu = &bno055;
+        screen = &ssd1306;
 
     };
 
@@ -27,21 +28,21 @@
     };
 
     pwm_motors {
-        
+
         compatible = "pwm-leds";
-    
+
     left_motor_pwm_in1: left_in1 {
         pwms = <&pwm2 1 100000 PWM_POLARITY_NORMAL>;
     };
-        
+
     left_motor_pwm_in2: left_in2 {
         pwms = <&pwm2 2 100000 PWM_POLARITY_NORMAL>;
     };
-    
+
     right_motor_pwm_in1: right_in1 {
         pwms = <&pwm2 3 100000 PWM_POLARITY_NORMAL>;
     };
-    
+
     right_motor_pwm_in2: right_in2 {
         pwms = <&pwm2 4 100000 PWM_POLARITY_NORMAL>;
     };
@@ -102,6 +103,12 @@
         reg = <0x29>;
     };
 
+    screen: ssd1306 {
+        compatible = "i2c-device";
+        status = "okay";
+        reg = <0x3c>;
+    };
+
 };
 
 &spi1 {
@@ -109,7 +116,7 @@
 };
 
     &pinctrl {
-   
+
     tim3_ch1_pa6: tim3_ch1_pa6 {
         bias-pull-up;
     };

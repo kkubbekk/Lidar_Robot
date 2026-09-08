@@ -7,13 +7,16 @@ project(lidar_robot_firmware)
 
 target_sources(app PRIVATE
     src/main.c
-    src/shared_data.h
-    src/task_motors.c
-    src/task_motors.h
-    src/task_imu.c
-    src/imu.c
-    src/imu.h
-    src/task_microros.c
+    # src/shared_data.h
+    # src/task_motors.c
+    # src/task_motors.h
+    # src/task_imu.c
+    # src/imu.c
+    # src/imu.h
+    # src/task_microros.c
+    src/task_screen.c
+    src/led_screen.h
+    src/led_screen.c
 )
 
 target_link_libraries(app PRIVATE microros)
