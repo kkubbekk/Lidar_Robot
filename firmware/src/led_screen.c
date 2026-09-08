@@ -80,7 +80,16 @@ void ssd1306_clear(ssd1306_t *display)
 }
 
 void ssd1306_update(ssd1306_t *display)
-{
+{   
+    write_command(display, 0x21);
+    write_command(display, 0x00);
+    write_command(display, 0x7F);
+
+
+    write_command(display, 0x22);
+    write_command(display, 0x00);
+    write_command(display, 0x07);
+
     write_data(display, display->buffer, sizeof(display->buffer));
 }
 
@@ -144,7 +153,6 @@ void ssd1306_draw_pixel(ssd1306_t *display, int x, int y, bool color)
         
     uint8_t bit = y % 8;
 
-    // 4. Modulo na bitach
     if (color) {
         display->buffer[index] |= (1 << bit);  
     } else {
@@ -152,7 +160,7 @@ void ssd1306_draw_pixel(ssd1306_t *display, int x, int y, bool color)
     }
 }
 
-void ssd1306_draw_string(ssd1306_t *display, int x, int y, const char* str)
+void ssd1306_draw_string(ssd1306_t *display, int x, int y, const char* str,uint8_t scale)
 {
     int current_x = x;
     while(*str != '\0')
@@ -167,19 +175,25 @@ void ssd1306_draw_string(ssd1306_t *display, int x, int y, const char* str)
             {
                 uint8_t col_data = font5x7[font_ind][col];
                 
-                for(int row = 0; row < 8; row++)
+                for(int row = 0; row < 7; row++)
                 {
                     if(col_data & (1<<row)) // kolor
                     {
-                        ssd1306_draw_pixel(display, current_x + col, y + row, true);
+                        for(uint8_t sx = 0;sx< scale; sx++)
+                        {
+                            for(uint8_t sy = 0;sy < scale; sy++)
+                            {
+                                uint8_t pixel_x = current_x + (col * scale) + sx;
+                                uint8_t pixel_y = y + (row * scale) + sy;
+                        
+                            ssd1306_draw_pixel(display, pixel_x, pixel_y, true);
+                            }
+                        }
                     }
-                    else
-                    {
-                        ssd1306_draw_pixel(display, current_x + col, y + row, false);
-                    }
+                
                 }
             }
-            current_x += 6; // 5 przesunieca(liczba) + 1( na odstep);
+            current_x += 6*scale; // 
         }
         str++;
     }
@@ -207,13 +221,25 @@ void ssd1306_draw_bitmap(ssd1306_t *display, int x, int y, int w, int h, const u
     }
 }
 
+void ssd1306_clear_area(ssd1306_t *display, int x, int y, uint8_t length, uint8_t width)
+{
+    for(int l = 0;l<length;l++)
+    {
+        for(int w = 0;w<width;w++)
+        {
+            ssd1306_draw_pixel(display,x+l,w+y,false);
+        }
+    }
+
+}
+
 void ssd1306_fill_rect(ssd1306_t *display, int x, int y, int length, int width)
 {
-    for(int row = 0; row < width; row++)
+    for(int dx=0 ;dx<length; dx++ )
     {
-        for(int col = 0; col < length; col++)
+        for(int dy = 0; dy < width; dy++)
         {
-            ssd1306_draw_pixel(display, x + col, y + row, true);
+            ssd1306_draw_pixel(display, dx + x, y + dy, true);
         }
     }
 }

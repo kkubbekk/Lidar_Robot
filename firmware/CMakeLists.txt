@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.20)
 
-list(APPEND ZEPHYR_EXTRA_MODULES "/home/kubekpc/zephyrproject/modules/lib/micro_ros_zephyr_module/modules/libmicroros")
+#list(APPEND ZEPHYR_EXTRA_MODULES "/home/kubekpc/zephyrproject/modules/lib/micro_ros_zephyr_module/modules/libmicroros")
 
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(lidar_robot_firmware)
@@ -19,4 +19,4 @@ target_sources(app PRIVATE
     src/led_screen.c
 )
 
-target_link_libraries(app PRIVATE microros)
+#target_link_libraries(app PRIVATE microros)

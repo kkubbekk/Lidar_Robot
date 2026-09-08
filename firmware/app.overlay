@@ -103,10 +103,10 @@
         reg = <0x29>;
     };
 
-    screen: ssd1306 {
+    ssd1306: ssd1306@3c {
         compatible = "i2c-device";
         status = "okay";
-        reg = <0x3c>;
+        reg = <0x3C>;
     };
 
 };

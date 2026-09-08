@@ -17,8 +17,8 @@ bool ssd1306_init(ssd1306_t *display);
 void ssd1306_clear(ssd1306_t *display);
 void ssd1306_update(ssd1306_t *display);
 void ssd1306_draw_pixel(ssd1306_t *display, int x, int y, bool color);
-void ssd1306_draw_string(ssd1306_t *display, int x, int y, const char *str);
+void ssd1306_draw_string(ssd1306_t *display, int x, int y, const char *str,uint8_t scale);
 void ssd1306_draw_bitmap(ssd1306_t *display, int x, int y, int w, int h, const uint8_t *bitmap);
 void ssd1306_fill_rect(ssd1306_t *display, int x, int y, int width, int height);
-
+void ssd1306_clear_area(ssd1306_t *display, int x, int y, uint8_t length, uint8_t width);
 #endif
