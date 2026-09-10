@@ -3,6 +3,13 @@
 #include <zephyr/drivers/gpio.h>
 #include "led_screen.h"
 
+
+//chwila
+#include <zephyr/sys/printk.h>
+#include "ringbuff.h"
+#include <stdlib.h>
+
+
 #define STACK_SIZE 4096
 #define PRIORITY 5
 
@@ -98,6 +105,22 @@ const uint8_t battery_empty_64x64[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+
+
+void display_battery_level_icon(ssd1306_t * display,int avg,int max_pixel_width,int height,int pos_x,int pos_y,int min_v,int max_v)
+{
+    int safe_avg = avg;
+    if (safe_avg > 4200) safe_avg = 4200;
+    if (safe_avg < 3300) safe_avg = 3300;
+
+    int current_width = (safe_avg - min_v)*max_pixel_width/(max_v-min_v);
+
+     ssd1306_fill_rect(display, pos_x,pos_y,current_width,height);
+
+}
+
+
+
 void task_screen(void *arg1, void *arg2, void *arg3)
 { 
 
@@ -141,14 +164,42 @@ void task_screen(void *arg1, void *arg2, void *arg3)
 
         ssd1306_draw_bitmap(&my_display, 30, 0, 64, 64, battery_empty_64x64);
         
-        
+       
         ssd1306_update(&my_display);
+
+   
+        
+
+
     }
+    RingBuf battery_buf;
+    ring_buff_init(&battery_buf);
+
+    int mock_base_voltage = 3800; 
 
     for(;;) {
-        k_msleep(1000);
+    int szum = (rand() % 300) - 150; 
+    int mock_adc = mock_base_voltage + szum;
+
+    ring_buff_write(&battery_buf, mock_adc);
+
+    int avg = avg_ring_buff(&battery_buf);
+
+    printk("ADC: %4d mV | Suma: %6d | Srednia: %4d mV\n", mock_adc, battery_buf.sum, avg);
+
+    ssd1306_clear(&my_display);
+        
+    
+    ssd1306_draw_bitmap(&my_display, 30, 0, 64, 64, battery_empty_64x64);
+
+    display_battery_level_icon(&my_display,avg,70,24,35,22,3300,4200);
+
+    ssd1306_update(&my_display);
+
+    k_msleep(100);
         
     }
 }
 
 //TODO: dodac se ringbuffera na odczyty adc  i liczyc jakos napiecie elegancko ze sredniej liczyc,srednia kroczaca,dodac funkcje rysujaca ladne ikonki 
+

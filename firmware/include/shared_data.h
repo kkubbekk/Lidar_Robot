@@ -1,4 +1,8 @@
 
+#define V_MIN 3300
+#define V_MAX 4200
+
+
 typedef struct {
     float v_left_mps;  // predkosc lewego kola w metrach na sekunde
     float v_right_mps; // predkosc prawego kola w metrach na sekunde

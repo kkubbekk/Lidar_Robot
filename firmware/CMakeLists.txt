@@ -5,6 +5,9 @@ cmake_minimum_required(VERSION 3.20)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(lidar_robot_firmware)
 
+target_include_directories(app PRIVATE include)
+
+
 target_sources(app PRIVATE
     src/main.c
     # src/shared_data.h
@@ -15,8 +18,9 @@ target_sources(app PRIVATE
     # src/imu.h
     # src/task_microros.c
     src/task_screen.c
-    src/led_screen.h
     src/led_screen.c
+    src/ringbuff.c
+   
 )
 
 #target_link_libraries(app PRIVATE microros)

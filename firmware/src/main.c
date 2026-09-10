@@ -20,6 +20,7 @@ const struct pwm_dt_spec pwm_right_in2 = PWM_DT_SPEC_GET(DT_ALIAS(pwm_right_in2)
  const struct i2c_dt_spec screen = I2C_DT_SPEC_GET(DT_ALIAS(screen));
 
 
+
  atomic_t robot_state = ATOMIC_INIT(STATE_OKAY); // inicjalizujemy stan poczatkowy robotaja na ok;
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
