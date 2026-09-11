@@ -22,6 +22,8 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
 
 uint8_t buffer[1024];
 
+extern uint8_t batterry_percentege; //bateria z task adc
+
 
 // const uint8_t battery_icon[36] = {
 //     0xFF, 0xFF, 0xFF,
@@ -107,13 +109,13 @@ const uint8_t battery_empty_64x64[] = {
 
 
 
-void display_battery_level_icon(ssd1306_t * display,int avg,int max_pixel_width,int height,int pos_x,int pos_y,int min_v,int max_v)
+void display_battery_level_icon(ssd1306_t * display,int avg,int max_pixel_width,int height,int pos_x,int pos_y,uint8_t percentege)
 {
-    int safe_avg = avg;
-    if (safe_avg > 4200) safe_avg = 4200;
-    if (safe_avg < 3300) safe_avg = 3300;
+    
+    if (percentege > 100) percentege = 100;
+    if (percentege < 0) percentege = 100;
 
-    int current_width = (safe_avg - min_v)*max_pixel_width/(max_v-min_v);
+    int current_width = max_pixel_width * percentege / 100;
 
      ssd1306_fill_rect(display, pos_x,pos_y,current_width,height);
 
@@ -162,11 +164,6 @@ void task_screen(void *arg1, void *arg2, void *arg3)
 
         k_msleep(1000);
 
-        ssd1306_draw_bitmap(&my_display, 30, 0, 64, 64, battery_empty_64x64);
-        
-       
-        ssd1306_update(&my_display);
-
    
         
 
@@ -175,7 +172,7 @@ void task_screen(void *arg1, void *arg2, void *arg3)
     RingBuf battery_buf;
     ring_buff_init(&battery_buf);
 
-    int mock_base_voltage = 3800; 
+
 
     for(;;) {
     int szum = (rand() % 300) - 150; 
